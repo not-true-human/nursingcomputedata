@@ -112,6 +112,27 @@ details { background: rgba(255,255,255,0.05); border-radius: 8px; }
 .legend-dot {
     width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
 }
+/* Make styles apply when the sidebar is collapsed into a dialog (mobile/small screens) */
+div[role="dialog"] section[data-testid="stSidebar"],
+div[role="dialog"] section[data-testid="stSidebar"] * {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)) !important;
+    color: white !important;
+    backdrop-filter: blur(12px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.37) !important;
+    border-radius: 14px !important;
+}
+
+/* Global fallbacks to ensure root background and text colors apply on all clients */
+html, body, .stApp, .main, [data-testid="stAppViewContainer"] {
+    background-color: #0a0a2e !important;
+    color: #fff !important;
+}
+
+/* Ensure upload area and buttons remain visible */
+div[data-testid="stFileUploader"], div[data-testid="stFileUploader"] * { color: white !important; background: rgba(255,255,255,0.02) !important; }
+.stButton>button { background-color: #4A90D9 !important; color: white !important; border: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
