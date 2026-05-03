@@ -891,7 +891,7 @@ with tab4:
 
         # Styled HTML table
         header_cells = "".join(
-            f"<th style='color:#aaa;font-size:12px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.15);text-align:{"left" if c=="Variable" else "center"}'>{c}</th>"
+            f"<th style='color:#aaa;font-size:12px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.15);text-align:{'left' if c=='Variable' else 'center'}'>{c}</th>"
             for c in ["Variable","Male Mean","Female Mean","Overall Mean","SD","t","df","p","Interpretation"]
         )
         body_rows = ""
