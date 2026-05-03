@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app
+    environment:
+      - PORT=8501
+    command: bash -c "streamlit run app.py --server.port $PORT --server.address 0.0.0.0"
