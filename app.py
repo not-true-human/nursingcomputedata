@@ -262,12 +262,39 @@ def interp_label(mean):
 # ── Load & prepare data ───────────────────────────────────────────────────────
 @st.cache_data
 def load_data(uploaded_file):
-    df = pd.read_excel(uploaded_file, sheet_name="50 Respondnets ", header=1)
+    # Try reading the Excel file with the expected sheet name first, then
+    # fall back to the first sheet if that fails. This makes the loader
+    # more robust to user-provided files with slightly different layouts.
+    df = None
+    last_exc = None
+    try:
+        df = pd.read_excel(uploaded_file, sheet_name="50 Respondnets ", header=1, engine='openpyxl')
+    except Exception as e:
+        last_exc = e
+        try:
+            # Try the first sheet with a conventional header
+            df = pd.read_excel(uploaded_file, sheet_name=0, header=0, engine='openpyxl')
+        except Exception as e2:
+            last_exc = e2
+            st.error(f"Failed to read uploaded Excel file: {last_exc}")
+            st.stop()
 
-    # Promote second header row if present and reset index
+    # Promote second header row if present and reset index (preserve existing
+    # behavior but guard against empty files)
+    if df is None or df.empty:
+        st.error("Uploaded file is empty or could not be parsed. Please check the file and try again.")
+        st.stop()
+
     if not df.empty:
-        df.columns = df.iloc[0].astype(str).tolist()
-        df = df.iloc[1:].reset_index(drop=True)
+        # If the first row looks like column names (strings) and there is a
+        # duplicated header row, promote it. This mirrors the prior logic but
+        # avoids failing when header selection differs.
+        try:
+            df.columns = df.iloc[0].astype(str).tolist()
+            df = df.iloc[1:].reset_index(drop=True)
+        except Exception:
+            # If promoting fails, continue with the dataframe as read.
+            pass
 
     # Sanitize column names: strip whitespace, collapse inner spaces, and make unique by suffixing duplicates
     new_cols = []
@@ -313,10 +340,23 @@ def load_data(uploaded_file):
                 'MF1','MF2','MF3','MF4','MF5','MF6']
     num_cols = ['Age','Sex'] + sti_cols + ant_cols
 
+    # Convert known numeric columns to numeric types
     df = df.assign(**{c: pd.to_numeric(df[c], errors='coerce') for c in num_cols if c in df.columns})
 
+    # Normalize gender values: support 1/0, 'M'/'F', or textual 'Male'/'Female'
+    if 'Sex' in df.columns:
+        gender_series = df['Sex'].map({1: 'Male', 0: 'Female'}).fillna(df['Sex'])
+        gender_series = (
+            gender_series.astype(str)
+            .str.strip()
+            .replace({'M': 'Male', 'F': 'Female', 'm': 'Male', 'f': 'Female', 'male': 'Male', 'female': 'Female'})
+            .str.title()
+        )
+        df['Gender'] = gender_series
+    else:
+        df['Gender'] = np.nan
+
     df = df.assign(
-        Gender     = df['Sex'].map({1: 'Male', 0: 'Female'}),
         CT_avg     = df[['CT1','CT2','CT3','CT4','CT5','CT6']].mean(axis=1),
         SS_avg     = df[['SS1','SS2','SS3','SS4','SS5','SS6']].mean(axis=1),
         PC_avg     = df[['PC1','PC2','PC3','PC4','PC5','PC6']].mean(axis=1),
