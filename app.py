@@ -76,11 +76,20 @@ section[data-testid="stSidebar"] .stMultiSelect label { color: white !important;
 /* Let the app background show through the glass */
 [data-testid="stAppViewContainer"] > div:first-child > div { background: transparent !important; }
 
-.stApp { background-color: #0a0a2e; }
-.main  { background-color: #0a0a2e; }
+/* Root and main containers */
+.stApp { background-color: #0a0a2e !important; }
+.main  { background-color: #0a0a2e !important; }
+
+/* Force dark background on dynamic Streamlit-generated elements and CSS modules */
+div[class*="css-"], section[class*="css-"], header[class*="css-"], main[class*="css-"], .block-container, .stBlock, .element-container {
+    background-color: #0a0a2e !important;
+    color: #fff !important;
+}
+
+/* Make sure metric containers and tables inherit dark style */
 div[data-testid="metric-container"] {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
     border-radius: 10px;
     padding: 12px 16px;
     color: white !important;
@@ -90,7 +99,7 @@ h1, h2, h3, h4 { color: white !important; }
 p, li, label   { color: #ccc !important; }
 hr { border-color: rgba(255,255,255,0.15) !important; }
 .stTabs [data-baseweb="tab-list"] {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.05) !important;
     border-radius: 8px;
 }
 .stTabs [data-baseweb="tab"] { color: white !important; }
@@ -106,12 +115,9 @@ details { background: rgba(255,255,255,0.05); border-radius: 8px; }
     padding: 12px 16px;
     margin-bottom: 12px;
 }
-.legend-row {
-    display: flex; align-items: center; gap: 10px; margin: 4px 0;
-}
-.legend-dot {
-    width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
-}
+.legend-row { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.legend-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
 /* Make styles apply when the sidebar is collapsed into a dialog (mobile/small screens) */
 div[role="dialog"] section[data-testid="stSidebar"],
 div[role="dialog"] section[data-testid="stSidebar"] * {
@@ -130,9 +136,19 @@ html, body, .stApp, .main, [data-testid="stAppViewContainer"] {
     color: #fff !important;
 }
 
+/* Make tables and dataframes use transparent/dark backgrounds */
+table, thead, tbody, tr, td, th, .stDataFrame, .stDataFrame td, .stDataFrame th {
+    background: transparent !important;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+
 /* Ensure upload area and buttons remain visible */
 div[data-testid="stFileUploader"], div[data-testid="stFileUploader"] * { color: white !important; background: rgba(255,255,255,0.02) !important; }
 .stButton>button { background-color: #4A90D9 !important; color: white !important; border: none !important; }
+
+/* Plotly background safety: force plot areas to be transparent so template shows through */
+.plotly-graph-div .main-svg, .js-plotly-plot .plotly, .plotly .bg { background: transparent !important; }
 </style>
 """, unsafe_allow_html=True)
 
